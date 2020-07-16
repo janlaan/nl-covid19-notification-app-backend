@@ -1,6 +1,8 @@
-﻿// Copyright © 2020 De Staat der Nederlanden, Ministerie van Volksgezondheid, Welzijn en Sport.
+﻿// Copyright 2020 De Staat der Nederlanden, Ministerie van Volksgezondheid, Welzijn en Sport.
 // Licensed under the EUROPEAN UNION PUBLIC LICENCE v. 1.2
 // SPDX-License-Identifier: EUPL-1.2
+
+using System.Text.Json.Serialization;
 
 namespace NL.Rijksoverheid.ExposureNotification.BackEnd.Components.RiskCalculationConfig
 {
@@ -10,10 +12,23 @@ namespace NL.Rijksoverheid.ExposureNotification.BackEnd.Components.RiskCalculati
     /// </summary>
     public class RiskCalculationConfigContent
     {
+        //Range 0-8
         public int MinimumRiskScore { get; set; }
-        public WeightingContent Attenuation { get; set; }
-        public WeightingContent DaysSinceLastExposure { get; set; }
-        public WeightingContent DurationLevelValues { get; set; }
-        public WeightingContent TransmissionRisk { get; set; }
+
+        //Might not be int..
+        public int[] AttenuationScores​ { get; set; }
+
+        //Might not be int..
+        public int[] DaysSinceLastExposureScores​ { get; set; }
+
+        //Might not be int..
+        public int[] DurationScores { get; set; }
+
+        //Might not be int..
+        public int[] TransmissionRiskScores​ { get; set; }
+
+        //Might not be int..
+        //length 
+        public int[] DurationAtAttenuationThresholds​ { get; set; }
     }
 }

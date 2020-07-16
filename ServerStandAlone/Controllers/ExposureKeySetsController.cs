@@ -1,10 +1,13 @@
-﻿// Copyright © 2020 De Staat der Nederlanden, Ministerie van Volksgezondheid, Welzijn en Sport.
+﻿// Copyright 2020 De Staat der Nederlanden, Ministerie van Volksgezondheid, Welzijn en Sport.
 // Licensed under the EUROPEAN UNION PUBLIC LICENCE v. 1.2
 // SPDX-License-Identifier: EUPL-1.2
 
-using System;
+using System.Net.Mime;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NL.Rijksoverheid.ExposureNotification.BackEnd.Components.Content;
 using NL.Rijksoverheid.ExposureNotification.BackEnd.Components.ExposureKeySets;
+using NL.Rijksoverheid.ExposureNotification.BackEnd.Components.WebApi;
 
 namespace NL.Rijksoverheid.ExposureNotification.BackEnd.ServerStandAlone.Controllers
 {
@@ -12,22 +15,17 @@ namespace NL.Rijksoverheid.ExposureNotification.BackEnd.ServerStandAlone.Control
     [Route("[controller]")]
     public class ExposureKeySetsController : ControllerBase
     {
-        private const string ContentTypeNameJson = "application/json";
-
-        /// <summary>
-        /// Swashbuckle has a long-lived bug around not supporting ProducesAttribute so we have to parse the content-type 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="command"></param>
-        /// <returns></returns>
         [HttpGet]
-        [Route("/ExposureKeySets/{id}")]
-        public IActionResult GetExposureKeySetsAg(string id, [FromServices]HttpGetAgExposureKeySetCommand command)
+        [Route(EndPointNames.CdnApi.ExposureKeySet + "/{id}")]
+        [ProducesResponseType(typeof(TemporaryExposureKeyExport), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(400)]
+        [Produces(MediaTypeNames.Application.Zip, MediaTypeNames.Application.Json)]
+        public async Task GetLatestConfig(string id, [FromServices] HttpGetSignedCdnContentOnlyCommand<ExposureKeySetContentEntity> command)
         {
-            var resultFormat = !string.Equals(Request.ContentType, ContentTypeNameJson, StringComparison.InvariantCultureIgnoreCase) 
-                ? ExposureKeySetFormat.Ag : ExposureKeySetFormat.Json;
-
-            return null; //TODO command.Execute(id, resultFormat);
+            await command.Execute(HttpContext, id);
         }
+
     }
 }

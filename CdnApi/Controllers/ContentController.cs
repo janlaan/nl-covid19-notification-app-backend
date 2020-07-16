@@ -1,11 +1,17 @@
-﻿// Copyright © 2020 De Staat der Nederlanden, Ministerie van Volksgezondheid, Welzijn en Sport.
+﻿// Copyright 2020 De Staat der Nederlanden, Ministerie van Volksgezondheid, Welzijn en Sport.
 // Licensed under the EUROPEAN UNION PUBLIC LICENCE v. 1.2
 // SPDX-License-Identifier: EUPL-1.2
 
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using NL.Rijksoverheid.ExposureNotification.BackEnd.Components.AppConfig;
 using NL.Rijksoverheid.ExposureNotification.BackEnd.Components.Content;
+using NL.Rijksoverheid.ExposureNotification.BackEnd.Components.Content.NL.Rijksoverheid.ExposureNotification.BackEnd.Components.Content;
+using NL.Rijksoverheid.ExposureNotification.BackEnd.Components.ExposureKeySets;
+using NL.Rijksoverheid.ExposureNotification.BackEnd.Components.ResourceBundle;
+using NL.Rijksoverheid.ExposureNotification.BackEnd.Components.RiskCalculationConfig;
+using NL.Rijksoverheid.ExposureNotification.BackEnd.Components.WebApi;
 
 namespace NL.Rijksoverheid.ExposureNotification.BackEnd.Applications.CdnApi.Controllers
 {
@@ -13,41 +19,39 @@ namespace NL.Rijksoverheid.ExposureNotification.BackEnd.Applications.CdnApi.Cont
     [Route("[controller]")]
     public class ContentController : ControllerBase
     {
-        public ContentController(ILogger<ContentController> logger)
+        [HttpGet]
+        [Route(EndPointNames.CdnApi.Manifest)]
+        public async Task GetManifest([FromServices] HttpGetCdnManifestCommand command)
         {
-            logger.LogInformation("CdnApi.Controllers init");
+            await command.Execute(HttpContext);
         }
 
         [HttpGet]
-        [Route("/manifest")]
-        public async Task GetCurrentManifest()
+        [Route(EndPointNames.CdnApi.AppConfig + "/{id}")]
+        public async Task GetAppConfig(string id, [FromServices] HttpGetCdnContentCommand<AppConfigContentEntity> command)
         {
-            var r = await new CdnContentHttpReader().Execute("/manifest");
-            new HttpGetCdnContentCommmand().Execute(HttpContext, r);
+            await command.Execute(HttpContext, id);
         }
 
         [HttpGet]
-        [Route("/rivmadvice/{id}")]
-        public async Task GetCurrentManifest(string id)
+        [Route(EndPointNames.CdnApi.ResourceBundle + "/{id}")]
+        public async Task GetResourceBundle(string id, [FromServices] HttpGetCdnContentCommand<ResourceBundleContentEntity> command)
         {
-            var r = await new CdnContentHttpReader().Execute("/rivmadvice", id);
-            new HttpGetCdnContentCommmand().Execute(HttpContext, r);
+            await command.Execute(HttpContext, id);
         }
 
         [HttpGet]
-        [Route("/RiskCalculationconfig/{id}")]
-        public async Task GetCurrent(string id)
+        [Route(EndPointNames.CdnApi.RiskCalculationParameters + "/{id}")]
+        public async Task GetRiskCalculationParameters(string id, [FromServices]HttpGetCdnContentCommand<RiskCalculationContentEntity> command)
         {
-            var r = await new CdnContentHttpReader().Execute("/RiskCalculationconfig", id);
-            new HttpGetCdnContentCommmand().Execute(HttpContext, r);
+            await command.Execute(HttpContext, id);
         }
 
         [HttpGet]
-        [Route("/blecalibration/{id}")]
-        public async Task GetCurrentBleCalibration(string id)
+        [Route(EndPointNames.CdnApi.ExposureKeySet + "/{id}")]
+        public async Task GetExposureKeySet(string id, [FromServices]HttpGetCdnContentCommand<ExposureKeySetContentEntity> command)
         {
-            var r = await new CdnContentHttpReader().Execute("/blecalibration", id);
-            new HttpGetCdnContentCommmand().Execute(HttpContext, r);
+            await command.Execute(HttpContext, id);
         }
     }
 }

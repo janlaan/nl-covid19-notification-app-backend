@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "ContentPusherEngine": {
+      "commandName": "Project",
+      "commandLineArgs": "nolog",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
